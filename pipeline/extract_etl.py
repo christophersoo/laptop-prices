@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from transform_etl import transform
 import requests
 
 init_page = 1
@@ -15,10 +16,15 @@ def extract_data(page):
     soup = BeautifulSoup(response.text, 'html.parser')
     listings = soup.find_all('li', class_='s-item')
 
+    mdict = {"name": [], "price": []}
+
     for listing in listings:
         name = listing.find('div', class_='s-item__title')
         price = listing.find('span', class_='s-item__price')
         if name and price:
-            print(f"Laptop: {name.text}, Price: {price.text}")
+            mdict["name"].append(name.text)
+            mdict["price"].append(price.text)
+
+    transform(mdict)
 
 extract_data(1)
