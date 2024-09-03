@@ -44,4 +44,13 @@ def load(df, table_name):
 
     insert_data(df, cur, table_name)
 
+# TO BE CONTINUED
 
+def retrieve(table):
+    cur = conn.cursor()
+
+    select_query = sql.SQL("""
+        SELECT * FROM {}
+    """).format(sql.Identifier(table))
+
+    cur.execute(select_query)
