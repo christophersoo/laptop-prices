@@ -1,3 +1,4 @@
+import pandas as pd
 import psycopg2
 from psycopg2 import sql, extras
 from dbinfo import DB_NAME, DB_USER, DB_PW, DB_HOST, DB_PORT
@@ -15,8 +16,10 @@ if not conn:
 else:
     print("Database Connected Successfully.")
 
+cur = conn.cursor()
 
-def insert_data(df, cur, table_name):
+
+def insert_data(df, table_name):
     values = [tuple(row) for row in df.values]
 
     insert_query = sql.SQL("""
@@ -26,10 +29,10 @@ def insert_data(df, cur, table_name):
     extras.execute_values(cur, insert_query, values)
     conn.commit()
     print(f'Inserted {len(df)} rows into table {table_name}')
+    conn.close()
 
 
 def load(df, table_name):
-    cur = conn.cursor()
 
     create_query = sql.SQL("""
         CREATE TABLE IF NOT EXISTS {} (
@@ -42,15 +45,11 @@ def load(df, table_name):
 
     conn.commit()
 
-    insert_data(df, cur, table_name)
-
-# TO BE CONTINUED
+    insert_data(df, table_name)
 
 def retrieve(table):
-    cur = conn.cursor()
 
-    select_query = sql.SQL("""
-        SELECT * FROM {}
-    """).format(sql.Identifier(table))
-
-    cur.execute(select_query)
+    select_query = f"SELECT * FROM {table};"
+    df = pd.read_sql(select_query, conn)
+    conn.close()
+    return df

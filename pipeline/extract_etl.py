@@ -1,8 +1,10 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 from transform_etl import transform
-from load_etl import load
 import requests
+
+min_page = 1
+max_page = 20
 
 def extract_data(page):
     url = f'https://www.ebay.co.uk/sch/i.html?_from=R40&_nkw=laptop&_sacat=0&_ipg=240&_pgn={page}'
@@ -25,7 +27,7 @@ def extract_data(page):
             mdict["price"].append(price.text)
 
     df_raw = pd.DataFrame(mdict)
-    load(df_raw, "raw_laptop_data")
+    transform(df_raw)
     
-for i in range(1, 20):
+for i in range(min_page, max_page):
     extract_data(i)
